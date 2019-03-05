@@ -1,19 +1,38 @@
-#code from midterm project (using bottle)
+# code from midterm project (using bottle)
 from bottle import route, static_file, run
-import tickets
+# import
 
+
+# homepage
 @route('/')
 def send_static():
-    return static_file("/index.html", root='')
+    return "test"
+    # return static_file("/index.html", root='')
 
+
+# game code file
 @route('/map.js')
 def send_statics():
-    return static_file("/map.js", root='')
+    return "ah"
+    # return static_file("/map.js", root='')
 
-@route('/tickets')
-def get_tickets():
-    return tickets.get_ticket_data("https://data.buffalony.gov/resource/ux3f-ypyc.json")
 
-#PORT IS FOR CODENVY
-run(host='0.0.0.0', port=8080, debug=True)
-#CODENVY PREVIEW URL: http://${server.port.8080}
+# helen
+# access player file and add player
+@route('/join')
+def add_player():
+    return "hi"
+
+
+# chaktim
+# access player file and remove player
+@route('/leave')
+def remove_player():
+    return "bye"
+
+# PORT IS FOR CODENVY
+# run(host='0.0.0.0', port=8080, debug=True)
+# CODENVY PREVIEW URL: http://${server.port.8080}
+
+
+run(host='localhost', port=8080)
