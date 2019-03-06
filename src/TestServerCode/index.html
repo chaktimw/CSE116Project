@@ -1,0 +1,20 @@
+<html>
+    <head>
+        <script src="player.js"></script>
+    </head>
+    <body onload="loadPlayers();">
+
+        Add Player: <input type="text" id="AddUsername">
+        Set Size: <input type="text" id="Size">
+        <button onClick="addUser();">Send</button>
+
+        Remove Player(s): <input type="text" id="RemoveUsername">
+        <button onClick="removeUser();">Send</button>
+        <br>
+        Warning, there are NO input filters. Username and data can be anything including nothing. <br>
+        This page is meant to only test basic functionality.<br>
+        The actual game will not have these fields available. <br>
+        <hr/>
+        <div id="players"></div><br/>
+    </body>
+</html>

@@ -1,18 +1,24 @@
 filename = "players.txt"
+
+
 def getPlayerList():
     players = []
     with open(filename) as file:
         for line in file:
-            players.append({"usernames": line.rstrip("\n\r")})
+            players.append({"username": line.rstrip("\n\r")})
     return players
 
+def addPlayer(data):
+    with open(filename, "a") as file:
+        file.write(data[0] + " " + data[1] + "\n")
+
 def removePlayer(username):
-    f = open("players.txt", "r")
+    f = open(filename, "r")
     lines = f.readlines()
     f.close()
-    f = open("players.txt", "w")
+    f = open(filename, "w")
     for line in lines:
-        if line != username + "\n":
+        if line.replace("\n", "").split(" ")[0] != username:
             f.write(line)
     f.close()
 
