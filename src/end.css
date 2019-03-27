@@ -1,0 +1,92 @@
+dsa{
+    position: fixed;
+
+}
+
+form {
+    font-family: cursive;
+}
+h1{
+     font-family: cursive;
+ }
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+header{
+    background: none;
+    margin: 0;
+}
+.grid{
+    position: fixed;
+}
+
+.sub-grid:before{
+    background: aqua;
+    content: '';
+}
+.sub-grid{
+    height: 63%;
+    width: 44.5%;
+    position: fixed;
+    top: 30%;
+    left: 25%;
+    z-index: 888;
+    overflow: auto;
+    background: none;
+    border: 2px solid black;
+}
+
+.grid1{
+    position: fixed;
+}
+
+.sub-grid1:before{
+    background: aqua;
+    content: '';
+}
+.sub-grid1{
+    height: 63%;
+    width: 15%;
+    position: fixed;
+    top: 30%;
+    left: 5%;
+    z-index: 888;
+    overflow: auto;
+    background: gray;
+    border: 2px solid black;
+}
+
+.grid2{
+    position: fixed;
+}
+
+.sub-grid2:before{
+    background: aqua;
+    content: '';
+}
+
+.sub-grid2{
+    height: 35%;
+    width: 15%;
+    position: fixed;
+    top: 30%;
+    left: 74%;
+    z-index: 888;
+    overflow: auto;
+    background: lavender;
+    border: 2px solid black;
+    padding-left: 5px;
+}
+
+.blob{
+    left: 43%;
+    top: 50px;
+    position: fixed;
+}
+
+body{
+    background-color:peachpuff;
+}
