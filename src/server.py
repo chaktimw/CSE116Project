@@ -1,38 +1,38 @@
 # code from midterm project (using bottle)
-from bottle import route, static_file, run
-# import
+import bottle
+import leave
+import json
 
 
 # homepage
-@route('/')
-def send_static():
-    return "test"
-    # return static_file("/index.html", root='')
+@bottle.route('/')
+def home():
+    return bottle.static_file("index.html", root='')
 
+# Testing Code
+@bottle.route('/player.js')
+def code():
+    return bottle.static_file("player.js", root='')
 
-# game code file
-@route('/map.js')
-def send_statics():
-    return "ah"
-    # return static_file("/map.js", root='')
-
-
-# helen
-# access player file and add player
-@route('/join')
-def add_player():
-    return "hi"
-
-
-# chaktim
 # access player file and remove player
-@route('/leave')
+@bottle.post('/remove')
 def remove_player():
-    return "bye"
+    content = bottle.request.body.read().decode()
+    content = json.loads(content)
+    leave.removePlayer(content['username'])
+    return json.dumps(leave.getPlayerList())
 
-# PORT IS FOR CODENVY
-# run(host='0.0.0.0', port=8080, debug=True)
-# CODENVY PREVIEW URL: http://${server.port.8080}
+@bottle.post('/add')
+def do_chat():
+    content = bottle.request.body.read().decode()
+    content = json.loads(content)
+    leave.addPlayer([content['message'], content['size']])
+    return json.dumps(leave.getPlayerList())
+
+@bottle.route('/players')
+def get_players():
+    return json.dumps(leave.getPlayerList())
 
 
-run(host='localhost', port=8080)
+bottle.run(host='localhost', port=8080)
+# bottle.run(host='10.84.139.100', port=80)

@@ -7,7 +7,7 @@ import json
 # homepage
 @bottle.route('/')
 def home():
-    return bottle.static_file("index.html", root='')
+    return bottle.static_file("test.txt", root='')
 
 # Testing Code
 @bottle.route('/player.js')
@@ -34,5 +34,5 @@ def get_players():
     return json.dumps(leave.getPlayerList())
 
 
-# bottle.run(host='localhost', port=8080)
-bottle.run(host='10.84.139.100', port=80)
+bottle.run(host='localhost', port=8080)
+# bottle.run(host='10.84.139.100', port=80)
