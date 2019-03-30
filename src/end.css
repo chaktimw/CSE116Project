@@ -38,6 +38,15 @@ header{
     background: none;
     border: 2px solid black;
 }
+#board{
+    position: absolute;
+}
+#misc{
+    position: absolute;
+}
+#player{
+    position: absolute;
+}
 
 .grid1{
     position: fixed;

@@ -22,8 +22,10 @@
 <h3 id="player2" class="id" style="color:blueviolet">May the biggest blob survive</h3>
 
 <div class="grid">
-    <div class="sub-grid" id="sg">
-        <h4>Agario:</h4>
+    <div class="sub-grid" id="field">
+        <canvas id = "board"></canvas>
+        <canvas id = "misc"></canvas>
+        <canvas id = "player"></canvas>
     </div>
 </div>
 <div class="grid1">
@@ -32,12 +34,10 @@
     </div>
 </div>
 <div class = "text">
-    <form>
-        <b>Nickname:<br></b>
-        <p> </p>
-        <input type="text" name="firstName"/>
-        <input type="submit" value="Start Game">
-    </form>
+    <b>Nickname:<br></b>
+    <p> </p>
+    <input type="text" id = "nick" maxlength = "15">
+    <button type="button" id = "start">Start Game</button>
 </div>
 <div class="grid2">
     <div class="sub-grid2" id="df">
@@ -53,4 +53,7 @@
 </div>
 
 </body>
+
+<script src = "TempGame.js"></script>
+
 </html>
