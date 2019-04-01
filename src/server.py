@@ -1,4 +1,3 @@
-# code from midterm project (using bottle)
 import bottle
 import leave
 import json
@@ -23,10 +22,11 @@ def remove_player():
     return json.dumps(leave.getPlayerList())
 
 @bottle.post('/add')
-def do_chat():
+def add_player():
     content = bottle.request.body.read().decode()
     content = json.loads(content)
-    leave.addPlayer([content['message'], content['size']])
+    # leave.addPlayer([content['message'], content['size']])
+    leave.addPlayer([content['message']])
     return json.dumps(leave.getPlayerList())
 
 @bottle.route('/players')

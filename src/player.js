@@ -35,13 +35,14 @@ function loadPlayers(){
 }
 
 function addUser(){
-    var messageElement = document.getElementById("AddUsername");
-    var sizeElement = document.getElementById("Size");
-    var message = messageElement.value;
-    var size = sizeElement.value;
-    messageElement.value = ""
-    sizeElement.value = ""
-    var toSend = JSON.stringify({"message": message, "size": size});
+    var userElement = document.getElementById("nick");
+    //var sizeElement = document.getElementById("Size");
+    var username = userElement.value;
+    //var size = sizeElement.value;
+    userElement.value = ""
+    //sizeElement.value = ""
+    //var toSend = JSON.stringify({"message": message, "size": size});
+    var toSend = JSON.stringify({"message": escapeHtml(username)});
     ajaxPostRequest("/add", toSend, load);
 }
 
@@ -51,4 +52,14 @@ function removeUser(){
     usernameElement.value = "";
     var content = JSON.stringify({"username": username});
     ajaxPostRequest("/remove", content, load);
+}
+
+//taken from stackoverflow
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
