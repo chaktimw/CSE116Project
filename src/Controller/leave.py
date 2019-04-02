@@ -1,4 +1,4 @@
-filename = "/getPlayers"
+filename = "Controller/players.txt"
 
 
 def getPlayerList():

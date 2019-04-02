@@ -17,10 +17,6 @@ def send_static():
 def code():
     return bottle.static_file("player.js", root='Controller/')
 
-@bottle.route('/getPlayers')
-def players_file():
-    return bottle.static_file("players.txt", root='Controller/')
-
 # Game Code
 @bottle.route('/TempGame.js')
 def game():
@@ -37,12 +33,10 @@ def remove_player():
 
 @bottle.post('/add')
 def add_player():
-    '''
     content = bottle.request.body.read().decode()
     content = json.loads(content)
     # leave.addPlayer([content['message'], content['size']])
     leave.addPlayer([content['username']])
-    '''
     return json.dumps(leave.getPlayerList())
 
 @bottle.route('/players')

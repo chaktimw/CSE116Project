@@ -25,7 +25,7 @@ function load(response){
     var players = "";
     var data = JSON.parse(response)
     for(var index in data){
-        players += data[index].username + " HA!</br>";
+        players += data[index].username + "</br>";
     }
     document.getElementById("players").innerHTML = players;
 }
@@ -36,21 +36,18 @@ function loadPlayers(){
 }
 
 function addUser(){
-    ajaxGetRequest("/players", load);
-}
-/**
- //var userElement = document.getElementById("nick");
- //var sizeElement = document.getElementById("Size");
- var username = document.getElementById("nick").value;
- //var size = sizeElement.value;
- //userElement.value = ""
- //sizeElement.value = ""
- //var toSend = JSON.stringify({"message": message, "size": size});
- var toSend = JSON.stringify({"username": escapeHtml(username)});
+    //var userElement = document.getElementById("nick");
+    //var sizeElement = document.getElementById("Size");
+    var username = document.getElementById("nick").value;
+    //var size = sizeElement.value;
+    //userElement.value = ""
+    //sizeElement.value = ""
+    //var toSend = JSON.stringify({"message": message, "size": size});
+    var toSend = JSON.stringify({"username": escapeHtml(username)});
 
- var toSend = JSON.stringify({"username": "Pillow"})
- ajaxPostRequest("/add", toSend, load);
- **/
+    //var toSend = JSON.stringify({"username": "Pillow"})
+    ajaxPostRequest("/add", toSend, load);
+}
 
 function removeUser(){
     var usernameElement = document.getElementById("RemoveUsername");
