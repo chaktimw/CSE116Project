@@ -6,7 +6,11 @@ import json
 # homepage
 @bottle.route('/')
 def home():
-    return bottle.static_file("index.html", root='')
+    return bottle.static_file("index.html", root='static/')
+
+@bottle.route('/end.css')
+def send_static():
+    return bottle.static_file("end.css", root='static/')
 
 # Testing Code
 @bottle.route('/player.js')
