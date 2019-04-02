@@ -1,4 +1,4 @@
-filename = "players.txt"
+filename = "/getPlayers"
 
 
 def getPlayerList():
@@ -10,7 +10,8 @@ def getPlayerList():
 
 def addPlayer(data):
     with open(filename, "a") as file:
-        file.write(data[0] + " " + data[1] + "\n")
+        # file.write(data[0] + " " + data[1] + "\n")
+        file.write(data[0] + "\n")
 
 def removePlayer(username):
     f = open(filename, "r")
@@ -18,7 +19,7 @@ def removePlayer(username):
     f.close()
     f = open(filename, "w")
     for line in lines:
-        if line.replace("\n", "").split(" ")[0] != username:
+        if line.replace("\n", "").split(" ")[1] != username:
             f.write(line)
     f.close()
 

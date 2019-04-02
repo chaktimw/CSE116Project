@@ -25,25 +25,32 @@ function load(response){
     var players = "";
     var data = JSON.parse(response)
     for(var index in data){
-        players += data[index].username + "</br>";
+        players += data[index].username + " HA!</br>";
     }
     document.getElementById("players").innerHTML = players;
 }
 
+
 function loadPlayers(){
-   ajaxGetRequest("/players", load);
+    ajaxGetRequest("/players", load);
 }
 
 function addUser(){
-    var messageElement = document.getElementById("AddUsername");
-    var sizeElement = document.getElementById("Size");
-    var message = messageElement.value;
-    var size = sizeElement.value;
-    messageElement.value = ""
-    sizeElement.value = ""
-    var toSend = JSON.stringify({"message": message, "size": size});
-    ajaxPostRequest("/add", toSend, load);
+    ajaxGetRequest("/players", load);
 }
+/**
+ //var userElement = document.getElementById("nick");
+ //var sizeElement = document.getElementById("Size");
+ var username = document.getElementById("nick").value;
+ //var size = sizeElement.value;
+ //userElement.value = ""
+ //sizeElement.value = ""
+ //var toSend = JSON.stringify({"message": message, "size": size});
+ var toSend = JSON.stringify({"username": escapeHtml(username)});
+
+ var toSend = JSON.stringify({"username": "Pillow"})
+ ajaxPostRequest("/add", toSend, load);
+ **/
 
 function removeUser(){
     var usernameElement = document.getElementById("RemoveUsername");
@@ -51,4 +58,13 @@ function removeUser(){
     usernameElement.value = "";
     var content = JSON.stringify({"username": username});
     ajaxPostRequest("/remove", content, load);
+}
+
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
