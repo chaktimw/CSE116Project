@@ -9,18 +9,24 @@ def home():
     return bottle.static_file("index.html", root='View/')
 
 @bottle.route('/end.css')
-def send_static():
+def css():
     return bottle.static_file("end.css", root='View/')
+
 
 # Testing Code
 @bottle.route('/player')
 def code():
     return bottle.static_file("player.js", root='Controller/')
 
-# Game Code
+
+# Game
 @bottle.route('/TempGame.js')
 def game():
     return bottle.static_file("TempGame.js", root='Model/')
+
+@bottle.route('/tiles.png')
+def img1():
+    return bottle.static_file("tiles.png", root='Model/')
 
 
 # access player file and remove player
