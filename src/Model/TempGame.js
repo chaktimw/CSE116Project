@@ -157,15 +157,21 @@ function updateChara(name, size, x, y) {
 // Eat Dots
 function eatDot(){
     for (var i = 0; i < allDots.length; i++){
-        if ((players["player"].pos_world.x - players["player"].size <= allDots[i].getPos.x &&
-            players["player"].pos_world.x + players["player"].size >= allDots[i].getPos.x) &&
-            (players["player"].pos_world.y - players["player"].size <= allDots[i].getPos.y &&
-                players["player"].pos_world.y + players["player"].size >= allDots[i].getPos.y)) {
-            players["player"].eaten += 1;
-            players["player"].size += 1 / (players["player"].eaten / 9);
-            players["player"].speed.x = 125 / players["player"].size;
-            players["player"].speed.y = 125 /players["player"].size;
-            allDots.splice(i, 1);
+        var dx = players["player"].pos_world.x - allDots[i].getPos.x;
+        var dy = players["player"].pos_world.y - allDots[i].getPos.y;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < players["player"].size + 3){
+            if ((players["player"].pos_world.x - players["player"].size <= allDots[i].getPos.x &&
+                players["player"].pos_world.x + players["player"].size >= allDots[i].getPos.x) &&
+                (players["player"].pos_world.y - players["player"].size <= allDots[i].getPos.y &&
+                    players["player"].pos_world.y + players["player"].size >= allDots[i].getPos.y)) {
+                players["player"].eaten += 1;
+                players["player"].size += 1 / (players["player"].eaten / 9);
+                players["player"].speed.x = 125 / players["player"].size;
+                players["player"].speed.y = 125 / players["player"].size;
+                allDots.splice(i, 1);
+            }
         }
     }
 }
