@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Agario</title>
-    <link rel="stylesheet" href="../../CSE116Project/end.css">
-    <script src="player.js"></script>
+    <link rel="stylesheet" href="/end.css">
+    <script src="/player"></script>
 </head>
 <meta charset="UTF-8">
-<body>
+<body onload = "loadPlayers();">
 <header>
     <h1 align = "center" style="color:deeppink">Welcome to Agario</h1>
     <hr/>
@@ -31,13 +31,14 @@
 <div class="grid1">
     <div class="sub-grid1" id="sf">
         <h4> Leaderboard:</h4>
+        <div id="players"></div>
     </div>
 </div>
 <div class = "text">
     <b>Nickname:<br></b>
     <p> </p>
     <input type="text" id = "nick" maxlength = "15">
-    <button type="button" id = "start">Start Game</button>
+    <button type="button" id = "start" onClick="addUser();">Start Game</button>
 </div>
 <div class="grid2">
     <div class="sub-grid2" id="df">
@@ -54,6 +55,6 @@
 
 </body>
 
-<script src = "TempGame.js"></script>
+<script src = "/Model/TempGame.js"></script>
 
 </html>

@@ -1,18 +1,27 @@
-# code from midterm project (using bottle)
 import bottle
-import leave
 import json
+from Controller import leave
 
 
 # homepage
 @bottle.route('/')
 def home():
-    return bottle.static_file("index.html", root='')
+    return bottle.static_file("index.html", root='View/')
+
+@bottle.route('/end.css')
+def send_static():
+    return bottle.static_file("end.css", root='View/')
 
 # Testing Code
-@bottle.route('/player.js')
+@bottle.route('/player')
 def code():
-    return bottle.static_file("player.js", root='')
+    return bottle.static_file("player.js", root='Controller/')
+
+# Game Code
+@bottle.route('/TempGame.js')
+def game():
+    return bottle.static_file("TempGame.js", root='Model/')
+
 
 # access player file and remove player
 @bottle.post('/remove')
@@ -23,10 +32,11 @@ def remove_player():
     return json.dumps(leave.getPlayerList())
 
 @bottle.post('/add')
-def do_chat():
+def add_player():
     content = bottle.request.body.read().decode()
     content = json.loads(content)
-    leave.addPlayer([content['message'], content['size']])
+    # leave.addPlayer([content['message'], content['size']])
+    leave.addPlayer([content['username']])
     return json.dumps(leave.getPlayerList())
 
 @bottle.route('/players')
