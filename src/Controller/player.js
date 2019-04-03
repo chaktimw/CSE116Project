@@ -36,16 +36,12 @@ function loadPlayers(){
 }
 
 function addUser(){
-    //var userElement = document.getElementById("nick");
     //var sizeElement = document.getElementById("Size");
-    var username = document.getElementById("nick").value;
+    var username = escapeHtml(document.getElementById("nick").value);
     //var size = sizeElement.value;
-    //userElement.value = ""
-    //sizeElement.value = ""
-    //var toSend = JSON.stringify({"message": message, "size": size});
-    var toSend = JSON.stringify({"username": escapeHtml(username)});
 
-    //var toSend = JSON.stringify({"username": "Pillow"})
+    //var toSend = JSON.stringify({"username": username, "size": size});
+    var toSend = JSON.stringify({"username": username});
     ajaxPostRequest("/add", toSend, load);
 }
 
