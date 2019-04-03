@@ -13,13 +13,13 @@ def css():
     return bottle.static_file("end.css", root='View/')
 
 
-# Testing Code
+# Test AJAX Code
 @bottle.route('/player')
 def code():
     return bottle.static_file("player.js", root='Controller/')
 
 
-# Game
+# Game Files
 @bottle.route('/TempGame.js')
 def game():
     return bottle.static_file("TempGame.js", root='Model/')
@@ -29,7 +29,7 @@ def img1():
     return bottle.static_file("tiles.png", root='Model/')
 
 
-# access player file and remove player
+# Access players file
 @bottle.post('/remove')
 def remove_player():
     content = bottle.request.body.read().decode()
@@ -41,8 +41,14 @@ def remove_player():
 def add_player():
     content = bottle.request.body.read().decode()
     content = json.loads(content)
-    # leave.addPlayer([content['message'], content['size']])
-    leave.addPlayer([content['username']])
+    leave.addPlayer(content['username'])
+    return json.dumps(leave.getPlayerList())
+
+@bottle.post('/update')
+def add_player():
+    content = bottle.request.body.read().decode()
+    content = json.loads(content)
+    leave.updatePlayer([content['username'], int(content['size'])])
     return json.dumps(leave.getPlayerList())
 
 @bottle.route('/players')

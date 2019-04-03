@@ -168,6 +168,10 @@ function eatDot(){
                     players["player"].pos_world.y + players["player"].size >= allDots[i].getPos.y)) {
                 players["player"].eaten += 1;
                 players["player"].size += 1 / (players["player"].eaten / 9);
+
+                //update leaderboard
+                updateUser(players["player"].user, players["player"].size) //#players.txt
+
                 players["player"].speed.x = 125 / players["player"].size;
                 players["player"].speed.y = 125 / players["player"].size;
                 allDots.splice(i, 1);
@@ -209,7 +213,8 @@ function game(){
 
 // Control
 startButton.addEventListener("click", function(){
-    players["player"].user = userName.value;
+    players["player"].user = escapeHtml(userName.value);
+    addUser() //#players.txt
     updateChara(players["player"].user, players["player"].size, players["player"].pos_player.x, players["player"].pos_player.y);
     userName.value = "";
     startButton.disabled = true;
@@ -254,4 +259,75 @@ function keyUp(event) {
     if (event.keyCode == 38) {
         keyPressed.up = false;
     }
+}
+
+//Saving data to filename to make a leaderboard
+
+//FIND ALL CODE USING FUNCTIONS BELOW BY SEARCHING #players.txt
+filename = "Model/players.txt"
+
+function ajaxGetRequest(path, callback){
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function(){
+        if (this.readyState === 4 && this.status === 200){
+            callback(this.response);
+        }
+    };
+    request.open("GET", path);
+    request.send();
+}
+
+function ajaxPostRequest(path, data, callback){
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function(){
+        if (this.readyState === 4 && this.status === 200){
+            callback(this.response);
+        }
+    };
+    request.open("POST", path);
+    request.send(data);
+}
+
+
+function load(response){
+    var players = "";
+    var data = JSON.parse(response)
+    for(var index in data){
+        players += data[index].username + "</br>";
+    }
+    document.getElementById("players").innerHTML = players;
+}
+
+
+function loadPlayers(){
+    ajaxGetRequest("/players", load);
+}
+
+function addUser(){
+    //var username = escapeHtml(document.getElementById("nick").value);
+    var toSend = JSON.stringify({"username": escapeHtml(userName.value)});
+    ajaxPostRequest("/add", toSend, load);
+}
+
+function updateUser(user, size) {
+    var toSend = JSON.stringify({"username": escapeHtml(user), "size": size});
+    ajaxPostRequest("/update", toSend, load);
+}
+
+function removeUser(){
+    var usernameElement = document.getElementById("RemoveUsername");
+    var username = usernameElement.value;
+    usernameElement.value = "";
+    var content = JSON.stringify({"username": username});
+    ajaxPostRequest("/remove", content, load);
+}
+
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/ /g, "_")
+        .replace(/'/g, "&#039;");
 }
