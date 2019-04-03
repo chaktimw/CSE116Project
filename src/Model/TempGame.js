@@ -8,7 +8,7 @@ createWorld.width = 3200;
 createWorld.position = "absolute";
 var contextWorld = createWorld.getContext("2d");
 var img = new Image();
-img.src = "Model/tiles.png";
+img.src = "/tiles.png";
 
 function makeWorld() {
     for (var i = 0; i < createWorld.height / img.height; i++) {
