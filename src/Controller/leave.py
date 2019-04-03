@@ -44,17 +44,18 @@ def updatePlayer(data):
     placement = 1
     for line in lines:
         split_line = line.replace("\n", "").split(" ")
-        update_line = str(placement) + " " + split_line[1] + " " + data[0] + " " + str(data[1]) + "\n"
+        update_line = " " + split_line[1] + " " + data[0] + " " + str(data[1]) + "\n"
         if int(split_line[3]) <= data[1] and update:
+            f.write(str(placement) + update_line)
             placement += 1
-            f.write(update_line)
             update = False
         f.write(str(placement) + " " + " ".join(split_line[1::]) + "\n")
         placement += 1
-    if update:
-        f.write(update_line)
     if len(lines) == 0:
-        f.write("1" + " > " + data[0] + " " + str(data[1]) + "\n")
+        f.write(str(placement) + " > " + data[0] + " " + str(data[1]) + "\n")
+    elif update:
+        f.write(str(placement) + update_line)
+        placement += 1
     f.close()
 
 # https://stackoverflow.com/questions/10272561/ajax-and-user-leaving-a-page
