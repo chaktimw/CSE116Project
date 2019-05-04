@@ -161,7 +161,7 @@ function eatDot(){
         var dy = players["player"].pos_world.y - allDots[i].getPos.y;
         var distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < players["player"].size + 3){
+        if (distance <= players["player"].size){
             if ((players["player"].pos_world.x - players["player"].size <= allDots[i].getPos.x &&
                 players["player"].pos_world.x + players["player"].size >= allDots[i].getPos.x) &&
                 (players["player"].pos_world.y - players["player"].size <= allDots[i].getPos.y &&
@@ -173,8 +173,11 @@ function eatDot(){
                 players["player"].speed.y = 125 / players["player"].size;
                 allDots.splice(i, 1);
             }
+            //update leaderboard
+            updateUser(players["player"].user, players["player"].eaten) //#players.txt
         }
     }
+
 }
 
 // Game Updates
@@ -186,8 +189,7 @@ function loop(){
     eatDot();
     getDots();
     drawDots();
-    //update leaderboard
-    updateUser(players["player"].user, players["player"].size) //#players.txt
+
 
     contextViewport.drawImage(createWorld,  players["player"].pos_world.x - viewport.width / 2,
         players["player"].pos_world.y - viewport.height / 2,
@@ -212,13 +214,16 @@ function game(){
 
 // Control
 startButton.addEventListener("click", function(){
+    checkUser()
+});
+function start(){
     players["player"].user = escapeHtml(userName.value);
-    addUser() //#players.txt
     updateChara(players["player"].user, players["player"].size, players["player"].pos_player.x, players["player"].pos_player.y);
-    userName.value = "";
+    // remove player requires a username id so line below is commented out
+    // userName.value = "";
     startButton.disabled = true;
     game();
-});
+}
 
 // Movement
 var keyPressed = {
@@ -230,32 +235,32 @@ var keyPressed = {
 
 function keyDown(event) {
     event.preventDefault();
-    if (event.keyCode == 39) {
+    if (event.keyCode == 39 || event.keyCode == 68) {
         keyPressed.right = true;
     }
-    if (event.keyCode == 37) {
+    if (event.keyCode == 37 || event.keyCode == 65) {
         keyPressed.left = true;
     }
-    if (event.keyCode == 40) {
+    if (event.keyCode == 40 || event.keyCode == 83) {
         keyPressed.down = true;
     }
-    if (event.keyCode == 38) {
+    if (event.keyCode == 38 || event.keyCode == 87) {
         keyPressed.up = true;
     }
 }
 
 function keyUp(event) {
     event.preventDefault();
-    if (event.keyCode == 39) {
+    if (event.keyCode == 39 || event.keyCode == 68) {
         keyPressed.right = false;
     }
-    if (event.keyCode == 37) {
+    if (event.keyCode == 37 || event.keyCode == 65) {
         keyPressed.left = false;
     }
-    if (event.keyCode == 40) {
+    if (event.keyCode == 40 || event.keyCode == 83) {
         keyPressed.down = false;
     }
-    if (event.keyCode == 38) {
+    if (event.keyCode == 38 || event.keyCode == 87) {
         keyPressed.up = false;
     }
 }
@@ -302,10 +307,22 @@ function loadPlayers(){
     ajaxGetRequest("/players", load);
 }
 
-function addUser(){
-    //var username = escapeHtml(document.getElementById("nick").value);
+function addUser(response){
+    var data = JSON.parse(response)
+    if(data == 0) {
+        //var username = escapeHtml(document.getElementById("nick").value);
+        var toSend = JSON.stringify({"username": escapeHtml(userName.value)});
+        document.getElementById("usernameCheck").innerHTML = "Welcome!";
+        start()
+        ajaxPostRequest("/add", toSend, load);
+    }else{
+        document.getElementById("usernameCheck").innerHTML = "Name Taken. Please try a different username.";
+    }
+}
+
+function checkUser() {
     var toSend = JSON.stringify({"username": escapeHtml(userName.value)});
-    ajaxPostRequest("/add", toSend, load);
+    ajaxPostRequest("/checkUser", toSend, addUser);
 }
 
 function updateUser(user, size) {
@@ -314,11 +331,8 @@ function updateUser(user, size) {
 }
 
 function removeUser(){
-    var usernameElement = document.getElementById("RemoveUsername");
-    var username = usernameElement.value;
-    usernameElement.value = "";
-    var content = JSON.stringify({"username": username});
-    ajaxPostRequest("/remove", content, load);
+    var toSend = JSON.stringify({"username": escapeHtml(userName.value)});
+    ajaxPostRequest("/remove", toSend, load);
 }
 
 function escapeHtml(unsafe) {

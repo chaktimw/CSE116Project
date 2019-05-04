@@ -64,7 +64,7 @@ header{
     left: 5%;
     z-index: 888;
     overflow: auto;
-    background: gray;
+    background: #ececec;
     border: 2px solid black;
 }
 

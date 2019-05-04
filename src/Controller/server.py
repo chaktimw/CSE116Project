@@ -44,6 +44,12 @@ def add_player():
     leave.updatePlayer([content['username'], int(content['size'])])
     return json.dumps(leave.getPlayerList())
 
+@bottle.post('/checkUser')
+def check_user():
+    content = bottle.request.body.read().decode()
+    content = json.loads(content)
+    return json.dumps(leave.checkUser(content['username']))
+
 @bottle.route('/players')
 def get_players():
     return json.dumps(leave.getPlayerList())

@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <title>Agario</title>
     <link rel="stylesheet" href="/end.css">
+    <script language="JavaScript">
+        window.onbeforeunload = confirmExit;
+        function confirmExit()
+        {
+            removeUser()
+            return ""
+        }
+    </script>
 </head>
 <meta charset="UTF-8">
 <body onload = "loadPlayers();">
@@ -38,6 +46,7 @@
     <p> </p>
     <input type="text" id = "nick" maxlength = "15">
     <button type="button" id = "start">Start Game</button>
+    <div id="usernameCheck"></div>
 </div>
 <div class="grid2">
     <div class="sub-grid2" id="df">

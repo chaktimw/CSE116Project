@@ -1,36 +1,45 @@
 
 filename = "Model/players.txt"
 
+def checkUser(username):
+    with open(filename) as file:
+        for line in file:
+            if line.replace("\n", "").split(" ")[2] == username:
+                return 1
+    return 0
 
 def getPlayerList():
     players = []
     with open(filename) as file:
         for line in file:
-            players.append({"username": line.rstrip("\n\r")})
+                players.append({"username": line.rstrip("\n\r")})
     return players
 
 def addPlayer(username):
-    # Prevent repeats (Optional)
-
-    # usernameexists = False
-    placement = 1
+    usernameexists = False
+    rank = 1
     with open(filename) as file:
         for line in file:
-            # if line.replace("\n", "").split(" ")[1] == username:
-                # usernameexists = True
-            placement += 1
-    # if not usernameexists:
-    with open(filename, "a") as file:
-        file.write(str(placement) + " > " + username + " 10" + "\n")
+            if line.replace("\n", "").split(" ")[2] == username:
+                usernameexists = True
+            rank += 1
+    if not usernameexists:
+        with open(filename, "a") as file:
+            file.write(str(rank) + " > " + username + " 0" + "\n")
 
 def removePlayer(username):
     f = open(filename, "r")
     lines = f.readlines()
     f.close()
     f = open(filename, "w")
+    rank = 1
     for line in lines:
-        if line.replace("\n", "").split(" ")[2] != username:
-            f.write(line)
+        split_line = line.replace("\n", "").split(" ")
+        if split_line[2] != username:
+            f.write(str(rank) + " " + split_line[1] + " " + split_line[2] + " " + split_line[3] + "\n")
+            rank += 1
+        else:
+            f.write("")
     f.close()
 
 def updatePlayer(data):
