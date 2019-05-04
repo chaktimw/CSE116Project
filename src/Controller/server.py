@@ -12,13 +12,6 @@ def home():
 def css():
     return bottle.static_file("end.css", root='View/')
 
-
-# Test AJAX Code
-@bottle.route('/player')
-def code():
-    return bottle.static_file("player.js", root='Controller/')
-
-
 # Game Files
 @bottle.route('/TempGame.js')
 def game():
