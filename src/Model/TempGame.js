@@ -169,9 +169,6 @@ function eatDot(){
                 players["player"].eaten += 1;
                 players["player"].size += 1 / (players["player"].eaten / 9);
 
-                //update leaderboard
-                updateUser(players["player"].user, players["player"].size) //#players.txt
-
                 players["player"].speed.x = 125 / players["player"].size;
                 players["player"].speed.y = 125 / players["player"].size;
                 allDots.splice(i, 1);
@@ -189,6 +186,8 @@ function loop(){
     eatDot();
     getDots();
     drawDots();
+    //update leaderboard
+    updateUser(players["player"].user, players["player"].size) //#players.txt
 
     contextViewport.drawImage(createWorld,  players["player"].pos_world.x - viewport.width / 2,
         players["player"].pos_world.y - viewport.height / 2,

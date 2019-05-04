@@ -19,7 +19,7 @@ def game():
 
 @bottle.route('/tiles.png')
 def img1():
-    return bottle.static_file("tiles.png", root='Model/')
+    return bottle.static_file("tiles.png", root='View/')
 
 
 # Access players file
