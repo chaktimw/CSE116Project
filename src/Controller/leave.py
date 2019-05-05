@@ -8,7 +8,16 @@ def checkUser(username):
                 return 1
     return 0
 
-def getPlayerList():
+def getPlayers(username):
+    players = []
+    with open(filename) as file:
+        for line in file:
+            split_line = line.rstrip("\n\r").split(" ")
+            if split_line[0] != username:
+                players.append({"user": line})
+    return players
+
+def getLeaderboard():
     players = []
     with open(filename) as file:
         rank = 1

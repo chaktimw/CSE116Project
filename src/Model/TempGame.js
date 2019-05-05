@@ -81,6 +81,9 @@ viewport.style.width = "100%";
 viewport.style.height = "100%";
 viewport.width = viewport.offsetWidth;
 viewport.height = viewport.offsetHeight;
+//player ID set after game starts
+//this is a huge area for cheating but whaaaatever
+var currentPlayer = ""
 
 
 // Model
@@ -91,6 +94,8 @@ var players = {
 };
 
 function Player(){
+    this.alive = true
+
     this.size = 10;
 
     this.user = "";
@@ -186,41 +191,45 @@ function eatDot(){
 
 // Game Updates
 function loop(){
-    contextViewport.clearRect(0, 0, viewport.width, viewport.height);
+    if(players["player"].alive) {
+        contextViewport.clearRect(0, 0, viewport.width, viewport.height);
 
-    players["player"].update();
+        players["player"].update();
 
-    eatDot();
-    getDots();
-    drawDots();
+        eatDot();
+        getDots();
+        drawDots();
 
-    //controlled updates
-    var d = new Date();
-    var n = d.getTime();
-    var timePassed = n - players["player"].time;
-    if(timePassed >= 200) {
-        //update leaderboard on players.txt
-        updateUser(
-            players["player"].user,
-            players["player"].eaten,
-            players["player"].pos_world.x,
-            players["player"].pos_world.y
-        );
-        players["player"].time = n
+        //controlled updates
+        var d = new Date();
+        var n = d.getTime();
+        var timePassed = n - players["player"].time;
+        if (timePassed >= 200 && players["player"].alive) {
+            //update leaderboard on players.txt
+            updateUser(
+                players["player"].user,
+                players["player"].eaten,
+                players["player"].pos_world.x,
+                players["player"].pos_world.y
+            );
+            players["player"].time = n
+        }
+
+
+        contextViewport.drawImage(createWorld, players["player"].pos_world.x - viewport.width / 2,
+            players["player"].pos_world.y - viewport.height / 2,
+            viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
+        contextViewport.drawImage(dots, players["player"].pos_world.x - viewport.width / 2,
+            players["player"].pos_world.y - viewport.height / 2,
+            viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
+
+
+        updateChara(players["player"].user, players["player"].size, players["player"].pos_player.x, players["player"].pos_player.y);
+
+        requestAnimationFrame(loop);
+    }else{
+        //game over screen
     }
-
-
-    contextViewport.drawImage(createWorld,  players["player"].pos_world.x - viewport.width / 2,
-        players["player"].pos_world.y - viewport.height / 2,
-        viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
-    contextViewport.drawImage(dots, players["player"].pos_world.x - viewport.width / 2,
-        players["player"].pos_world.y - viewport.height / 2,
-        viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
-
-
-    updateChara(players["player"].user, players["player"].size, players["player"].pos_player.x, players["player"].pos_player.y);
-
-    requestAnimationFrame(loop);
 }
 
 // Start Up of Game / Controls
@@ -236,7 +245,7 @@ startButton.addEventListener("click", function(){
     checkUser()
 });
 function start(){
-    players["player"].user = escapeHtml(userName.value);
+    currentPlayer = players["player"].user = escapeHtml(userName.value);
     updateChara(players["player"].user, players["player"].size, players["player"].pos_player.x, players["player"].pos_player.y);
     userName.value = "";
     startButton.disabled = true;
@@ -281,6 +290,11 @@ function keyUp(event) {
     if (event.keyCode == 38 || event.keyCode == 87) {
         keyPressed.up = false;
     }
+}
+
+function kill() {
+    players["player"].alive = false
+    removeUser()
 }
 
 //Saving data to filename
