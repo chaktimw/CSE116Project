@@ -110,6 +110,11 @@ function Player(){
         "y": 10
     };
 
+    //update time - chaktim
+    var d = new Date();
+    var n = d.getTime();
+    this.time = n
+
     // Update Location of Player
     this.update = function() {
         if (keyPressed.right && this.pos_world.x < createWorld.width - this.size) {
@@ -172,9 +177,8 @@ function eatDot(){
                 players["player"].speed.x = 125 / players["player"].size;
                 players["player"].speed.y = 125 / players["player"].size;
                 allDots.splice(i, 1);
+
             }
-            //update leaderboard
-            updateUser(players["player"].user, players["player"].eaten) //#players.txt
         }
     }
 
@@ -189,6 +193,21 @@ function loop(){
     eatDot();
     getDots();
     drawDots();
+
+    //controlled updates
+    var d = new Date();
+    var n = d.getTime();
+    var timePassed = n - players["player"].time;
+    if(timePassed >= 200) {
+        //update leaderboard on players.txt
+        updateUser(
+            players["player"].user,
+            players["player"].eaten,
+            players["player"].pos_world.x,
+            players["player"].pos_world.y
+        );
+        players["player"].time = n
+    }
 
 
     contextViewport.drawImage(createWorld,  players["player"].pos_world.x - viewport.width / 2,
@@ -219,8 +238,7 @@ startButton.addEventListener("click", function(){
 function start(){
     players["player"].user = escapeHtml(userName.value);
     updateChara(players["player"].user, players["player"].size, players["player"].pos_player.x, players["player"].pos_player.y);
-    // remove player requires a username id so line below is commented out
-    // userName.value = "";
+    userName.value = "";
     startButton.disabled = true;
     game();
 }
@@ -265,9 +283,7 @@ function keyUp(event) {
     }
 }
 
-//Saving data to filename to make a leaderboard
-
-//FIND ALL CODE USING FUNCTIONS BELOW BY SEARCHING #players.txt
+//Saving data to filename
 filename = "Model/players.txt"
 
 function ajaxGetRequest(path, callback){
@@ -310,10 +326,12 @@ function loadPlayers(){
 function addUser(response){
     var data = JSON.parse(response)
     if(data == 0) {
-        //var username = escapeHtml(document.getElementById("nick").value);
-        var toSend = JSON.stringify({"username": escapeHtml(userName.value)});
-        document.getElementById("usernameCheck").innerHTML = "Welcome!";
         start()
+        var toSend = JSON.stringify({
+            "username": players["player"].user,
+            "x": players["player"].pos_world.x,
+            "y": players["player"].pos_world.y});
+        document.getElementById("usernameCheck").innerHTML = "Welcome!";
         ajaxPostRequest("/add", toSend, load);
     }else{
         document.getElementById("usernameCheck").innerHTML = "Name Taken. Please try a different username.";
@@ -325,13 +343,13 @@ function checkUser() {
     ajaxPostRequest("/checkUser", toSend, addUser);
 }
 
-function updateUser(user, size) {
-    var toSend = JSON.stringify({"username": escapeHtml(user), "size": size});
+function updateUser(user, size, x, y) {
+    var toSend = JSON.stringify({"username": escapeHtml(user), "size": size, "x": x, "y": y});
     ajaxPostRequest("/update", toSend, load);
 }
 
 function removeUser(){
-    var toSend = JSON.stringify({"username": escapeHtml(userName.value)});
+    var toSend = JSON.stringify({"username": players["player"].user});
     ajaxPostRequest("/remove", toSend, load);
 }
 

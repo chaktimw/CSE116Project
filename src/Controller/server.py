@@ -34,14 +34,14 @@ def remove_player():
 def add_player():
     content = bottle.request.body.read().decode()
     content = json.loads(content)
-    leave.addPlayer(content['username'])
+    leave.addPlayer(content['username'], int(content['x']), int(content['y']))
     return json.dumps(leave.getPlayerList())
 
 @bottle.post('/update')
 def add_player():
     content = bottle.request.body.read().decode()
     content = json.loads(content)
-    leave.updatePlayer([content['username'], int(content['size'])])
+    leave.updatePlayer([content['username'], int(content['size']), int(content['x']), int(content['y'])])
     return json.dumps(leave.getPlayerList())
 
 @bottle.post('/checkUser')

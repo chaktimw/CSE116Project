@@ -4,40 +4,35 @@ filename = "Model/players.txt"
 def checkUser(username):
     with open(filename) as file:
         for line in file:
-            if line.replace("\n", "").split(" ")[2] == username:
+            if line.replace("\n", "").split(" ")[0] == username:
                 return 1
     return 0
 
 def getPlayerList():
     players = []
     with open(filename) as file:
+        rank = 1
         for line in file:
-                players.append({"username": line.rstrip("\n\r")})
+            line = line.rstrip("\n\r").split(" ")
+            # leaderboard only needs name and score
+            newline = str(rank) + " -> " + line[0] + " " + line[1]
+            players.append({"username": newline})
+            rank += 1
     return players
 
-def addPlayer(username):
-    usernameexists = False
-    rank = 1
-    with open(filename) as file:
-        for line in file:
-            if line.replace("\n", "").split(" ")[2] == username:
-                usernameexists = True
-            rank += 1
-    if not usernameexists:
-        with open(filename, "a") as file:
-            file.write(str(rank) + " > " + username + " 0" + "\n")
+def addPlayer(username, x, y):
+    with open(filename, "a") as file:
+        file.write(username + " 0 " + str(x) + " " + str(y) + "\n")
 
 def removePlayer(username):
     f = open(filename, "r")
     lines = f.readlines()
     f.close()
     f = open(filename, "w")
-    rank = 1
     for line in lines:
         split_line = line.replace("\n", "").split(" ")
-        if split_line[2] != username:
-            f.write(str(rank) + " " + split_line[1] + " " + split_line[2] + " " + split_line[3] + "\n")
-            rank += 1
+        if split_line[0] != username:
+            f.write(line)
         else:
             f.write("")
     f.close()
@@ -49,31 +44,14 @@ def updatePlayer(data):
     f.close()
     f = open(filename, "w")
     update = True
-    update_line = ""
-    placement = 1
+    update_line = data[0] + " " + str(data[1]) + " " + str(data[2]) + " " + str(data[3]) + "\n"
     for line in lines:
+        # line from players.txt vs line that is to be added
         split_line = line.replace("\n", "").split(" ")
-        update_line = " " + split_line[1] + " " + data[0] + " " + str(data[1]) + "\n"
-        if int(split_line[3]) <= data[1] and update:
-            f.write(str(placement) + update_line)
-            placement += 1
+        if int(split_line[1]) <= data[1] and update:
+            f.write(update_line)
             update = False
-        f.write(str(placement) + " " + " ".join(split_line[1::]) + "\n")
-        placement += 1
-    if len(lines) == 0:
-        f.write(str(placement) + " > " + data[0] + " " + str(data[1]) + "\n")
-    elif update:
-        f.write(str(placement) + update_line)
-        placement += 1
+        f.write(line)
+    if update:
+        f.write(update_line)
     f.close()
-
-# https://stackoverflow.com/questions/10272561/ajax-and-user-leaving-a-page
-# ajax user leave post code:
-# $(window).unload(function(){
-#     $.ajax({
-#         type: 'POST',
-#         url: 'script.php',
-#         async:false,
-#         data: {key_leave:"289583002"}
-#     });
-# });
