@@ -21,7 +21,30 @@ function makeWorld() {
 
     requestAnimationFrame(loop);
 }
+// Players
+var enemies = {}
+function enemy(username, size, x, y) {
+    this.username = username;
+    this.eaten = size;
+    this.pos_world = {
+        "x": x,
+        "y": y
+    };
+    this.alive = true
+}
 
+function updateEnemies(listOfEnemies){
+    for(var playerLine in listOfEnemies){
+        var data = playerLine.split(" ");
+        if(!(data[0] in enemies)){
+            enemies.data[0] = new enemy(data[0], data[1], data[2], data[3])
+        }else{
+            enemies.data[0].eaten = data[1];
+            enemies.data[1].pos_world.x = data[2]
+            enemies.data[1].pos_world.y = data[3]
+        }
+    }
+}
 
 // Dots
 var dots = document.createElement("canvas");
@@ -196,11 +219,7 @@ function loop(){
 
         players["player"].update();
 
-        eatDot();
-        getDots();
-        drawDots();
-
-        //controlled updates
+        //timed updates
         var d = new Date();
         var n = d.getTime();
         var timePassed = n - players["player"].time;
@@ -212,9 +231,13 @@ function loop(){
                 players["player"].pos_world.x,
                 players["player"].pos_world.y
             );
+            getEnemies()
             players["player"].time = n
         }
 
+        eatDot();
+        getDots();
+        drawDots();
 
         contextViewport.drawImage(createWorld, players["player"].pos_world.x - viewport.width / 2,
             players["player"].pos_world.y - viewport.height / 2,
@@ -246,6 +269,7 @@ startButton.addEventListener("click", function(){
 });
 function start(){
     currentPlayer = players["player"].user = escapeHtml(userName.value);
+    getEnemies()
     updateChara(players["player"].user, players["player"].size, players["player"].pos_player.x, players["player"].pos_player.y);
     userName.value = "";
     startButton.disabled = true;
@@ -365,6 +389,11 @@ function updateUser(user, size, x, y) {
 function removeUser(){
     var toSend = JSON.stringify({"username": players["player"].user});
     ajaxPostRequest("/remove", toSend, load);
+}
+
+function getEnemies(){
+    var toSend = JSON.stringify({"username": currentPlayer})
+    ajaxPostRequest("/users", toSend, updateEnemies)
 }
 
 function escapeHtml(unsafe) {

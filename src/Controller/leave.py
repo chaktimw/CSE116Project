@@ -14,8 +14,8 @@ def getPlayers(username):
         for line in file:
             split_line = line.rstrip("\n\r").split(" ")
             if split_line[0] != username:
-                players.append({"user": line})
-    return players
+                players.append(line)
+    return {"users": players}
 
 def getLeaderboard():
     players = []
