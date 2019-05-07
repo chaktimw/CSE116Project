@@ -22,11 +22,14 @@ function makeWorld() {
     requestAnimationFrame(loop);
 }
 
+var sizeRoot = 7 / 8.0
+
 // Players
 var enemies = {};
 function enemy(username, size, x, y) {
     this.username = username;
     this.eaten = size;
+    this.size = 10 + Math.pow(this.eaten, sizeRoot);
     this.pos_world = {
         "x": x,
         "y": y
@@ -49,15 +52,19 @@ enemyField.height = 3200;
 enemyField.width = 3200;
 var contextEnemies = enemyField.getContext("2d");
 
-function addEnemy(x, y){
+function addEnemy(name, size, x, y){
     contextEnemies.beginPath();
-    contextEnemies.arc(x, y, 5, 0, 2 * Math.PI);
+    contextEnemies.arc(x, y, size, 0, 2 * Math.PI);
     contextEnemies.fillStyle = "#ffbab3";
     contextEnemies.fill();
     contextEnemies.lineWidth = 2;
     contextEnemies.strokeStyle = "#ff7069";
     contextEnemies.stroke();
     contextEnemies.closePath();
+
+    // Adds Username in center of circle
+    contextEnemies.fillStyle = "black";
+    contextEnemies.fillText(name, x, y);
 }
 
 function drawEnemies(){
@@ -65,6 +72,8 @@ function drawEnemies(){
 
     for (var unit in enemies){
         addEnemy(
+            enemies[unit].username,
+            enemies[unit].size,
             enemies[unit].pos_world.x,
             enemies[unit].pos_world.y
         );
@@ -227,10 +236,10 @@ function eatDot(){
                 (players["player"].pos_world.y - players["player"].size <= allDots[i].getPos.y &&
                     players["player"].pos_world.y + players["player"].size >= allDots[i].getPos.y)) {
                 players["player"].eaten += 1;
-                players["player"].size += 1 / (players["player"].eaten / 9);
+                players["player"].size = 10 + Math.pow(players["player"].eaten, sizeRoot);
 
-                players["player"].speed.x = 125 / players["player"].size;
-                players["player"].speed.y = 125 / players["player"].size;
+                players["player"].speed.x = 100 / players["player"].size;
+                players["player"].speed.y = 100 / players["player"].size;
                 allDots.splice(i, 1);
 
             }
