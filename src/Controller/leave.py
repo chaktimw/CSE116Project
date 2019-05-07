@@ -17,32 +17,22 @@ def getPlayers(username):
                 players.append(line)
     return {"users": players}
 
-def getLeaderboard2(username):
-    players = {"leaderboard": [], "enemies": []}
+# this is version 2
+def getLeaderboard2():
+    players = []
     with open(filename) as file:
-        rank = 1
         for line in file:
-            # get enemies
-            split_line = line.rstrip("\n\r").split(" ")
-            if split_line[0] != username:
-                players["enemies"].append(line)
-            # get leader board
-            line = line.rstrip("\n\r").split(" ")
-            # leader board only needs name and score
-            newline = str(rank) + " -> " + line[0] + " " + line[1]
-            players["leaderboard"].append(newline)
-            rank += 1
+            players.append(line)
     return players
 
+# useless, version 2 is better
+# should delete method below in future
 def getLeaderboard():
     players = {"leaderboard": []}
     with open(filename) as file:
-        rank = 1
         for line in file:
             line = line.rstrip("\n\r").split(" ")
-            newline = str(rank) + " -> " + line[0] + " " + line[1]
-            players["leaderboard"].append(newline)
-            rank += 1
+            players["leaderboard"].append(line)
     return players
 
 def addPlayer(username, x, y):

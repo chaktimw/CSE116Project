@@ -22,7 +22,7 @@ function makeWorld() {
     requestAnimationFrame(loop);
 }
 
-var sizeRoot = 7 / 8.0
+var sizeRoot = 7 / 8.0;
 
 // Players
 var enemies = {};
@@ -41,7 +41,9 @@ function updateEnemies(listOfEnemies){
     enemies = {};
     for(var playerLine in listOfEnemies){
         var data = listOfEnemies[playerLine].split(" ");
-        enemies[data[0]] = new enemy(data[0], data[1], data[2], data[3])
+        if(players["player"].user != data[0]) {
+            enemies[data[0]] = new enemy(data[0], data[1], data[2], data[3])
+        }
     }
 }
 
@@ -77,6 +79,20 @@ function drawEnemies(){
             enemies[unit].pos_world.x,
             enemies[unit].pos_world.y
         );
+    }
+}
+
+// enemies eat you
+// not fully done yet
+function eatPlayer(){
+    for (var i in enemies){
+        var dx = players["player"].pos_world.x - enemies[i].pos_world.x;
+        var dy = players["player"].pos_world.y - enemies[i].pos_world.y;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance <= enemies[i].size){
+            kill()
+        }
     }
 }
 
@@ -170,14 +186,15 @@ function Player(){
     };
 
     this.speed = {
-        "x": 10,
-        "y": 10
+        "x": 5,
+        "y": 5
     };
 
     //update time - chaktim
     var d = new Date();
     var n = d.getTime();
-    this.time = n
+    this.time = n;
+    this.gametime = n;
 
     // Update Location of Player
     this.update = function() {
@@ -238,62 +255,67 @@ function eatDot(){
                 players["player"].eaten += 1;
                 players["player"].size = 10 + Math.pow(players["player"].eaten, sizeRoot);
 
-                players["player"].speed.x = 100 / players["player"].size;
-                players["player"].speed.y = 100 / players["player"].size;
+                players["player"].speed.x = 50 / players["player"].size;
+                players["player"].speed.y = 50 / players["player"].size;
                 allDots.splice(i, 1);
 
             }
         }
     }
-
 }
 
 // Game Updates
 function loop(){
-    if(players["player"].alive) {
-        contextViewport.clearRect(0, 0, viewport.width, viewport.height);
+    //timed updates
+    var d = new Date();
+    var n = d.getTime();
+    //var timePassed2 = n - players["player"].gametime;
+    //if (timePassed2 >= 10) {
+        if(players["player"].alive) {
+            contextViewport.clearRect(0, 0, viewport.width, viewport.height);
 
-        players["player"].update();
+            players["player"].update();
 
-        //timed updates
-        var d = new Date();
-        var n = d.getTime();
-        var timePassed = n - players["player"].time;
-        if (timePassed >= 100 && players["player"].alive) {
-            //update leaderboard on players.txt
-            updateUser(
-                players["player"].user,
-                players["player"].eaten,
-                players["player"].pos_world.x,
-                players["player"].pos_world.y
-            );
-            // getEnemies();
-            players["player"].time = n
+            //timed updates
+            var timePassed = n - players["player"].time;
+            if (timePassed >= 150 && players["player"].alive) {
+                //update leaderboard on players.txt
+                updateUser(
+                    players["player"].user,
+                    players["player"].eaten,
+                    players["player"].pos_world.x,
+                    players["player"].pos_world.y
+                );
+                // getEnemies();
+                players["player"].time = n
+            }
+
+            eatDot();
+            getDots();
+            drawDots();
+
+            drawEnemies();
+
+            contextViewport.drawImage(createWorld, players["player"].pos_world.x - viewport.width / 2,
+                players["player"].pos_world.y - viewport.height / 2,
+                viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
+            contextViewport.drawImage(dots, players["player"].pos_world.x - viewport.width / 2,
+                players["player"].pos_world.y - viewport.height / 2,
+                viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
+            contextViewport.drawImage(enemyField, players["player"].pos_world.x - viewport.width / 2,
+                players["player"].pos_world.y - viewport.height / 2,
+                viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
+
+
+            updateChara(players["player"].user, players["player"].size, players["player"].pos_player.x, players["player"].pos_player.y);
+
+            requestAnimationFrame(loop);
+        }else{
+            //game over screen
         }
 
-        eatDot();
-        getDots();
-        drawDots();
-
-        drawEnemies();
-
-        contextViewport.drawImage(createWorld, players["player"].pos_world.x - viewport.width / 2,
-            players["player"].pos_world.y - viewport.height / 2,
-            viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
-        contextViewport.drawImage(dots, players["player"].pos_world.x - viewport.width / 2,
-            players["player"].pos_world.y - viewport.height / 2,
-            viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
-        contextViewport.drawImage(enemyField, players["player"].pos_world.x - viewport.width / 2,
-            players["player"].pos_world.y - viewport.height / 2,
-            viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
-
-
-        updateChara(players["player"].user, players["player"].size, players["player"].pos_player.x, players["player"].pos_player.y);
-
-        requestAnimationFrame(loop);
-    }else{
-        //game over screen
-    }
+        //players["player"].gametime = n
+    //}
 }
 
 // Start Up of Game / Controls
@@ -357,7 +379,7 @@ function keyUp(event) {
 }
 
 function kill() {
-    players["player"].alive = false
+    players["player"].alive = false;
     removeUser()
 }
 
@@ -391,22 +413,27 @@ function load(response){
     var players = "";
     var data = JSON.parse(response);
     var leaderboardData = data["leaderboard"];
+    var rank = 1;
     for(var index in leaderboardData){
-        players += leaderboardData[index] + "</br>";
+        var line = rank.toString() + " -> " + leaderboardData[index][0] + " " + leaderboardData[index][1] + "</br>";
+        players += line;
+        rank++
     }
     document.getElementById("players").innerHTML = players;
 }
 
 function load2(response){
     var players = "";
-    var data = JSON.parse(response)
-    var leaderboardData = data["leaderboard"];
-    for(var index in leaderboardData){
-        players += leaderboardData[index] + "</br>";
+    var data = JSON.parse(response);
+    var rank = 1;
+    for(var point in data){
+        var index = data[point].split(" ");
+        var line = rank.toString() + " -> " + index[0] + " " + index[1] + "</br>";
+        players += line;
+        rank++
     }
     document.getElementById("players").innerHTML = players;
-
-    updateEnemies(data["enemies"])
+    updateEnemies(data)
 }
 
 
@@ -430,12 +457,12 @@ function addUser(response){
 }
 
 function checkUser() {
-    var toSend = JSON.stringify({"username": escapeHtml(userName.value)});
+    var toSend = JSON.stringify(escapeHtml(userName.value));
     ajaxPostRequest("/checkUser", toSend, addUser);
 }
 
 function updateUser(user, size, x, y) {
-    var toSend = JSON.stringify({"username": user, "size": size, "x": x, "y": y});
+    var toSend = JSON.stringify([user, size, Math.floor(x), Math.floor(y)]);
     ajaxPostRequest("/update", toSend, load2);
 }
 

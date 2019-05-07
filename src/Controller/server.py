@@ -41,18 +41,14 @@ def add_player():
 def add_player():
     content = bottle.request.body.read().decode()
     content = json.loads(content)
-    leave.updatePlayer([content['username'], int(content['size']), int(content['x']), int(content['y'])])
-    return get_players2([content['username']])
-
-
-def get_players2(username):
-    return json.dumps(leave.getLeaderboard2(username))
+    leave.updatePlayer(content)
+    return json.dumps(leave.getLeaderboard2())
 
 @bottle.post('/checkUser')
 def check_user():
     content = bottle.request.body.read().decode()
     content = json.loads(content)
-    return json.dumps(leave.checkUser(content['username']))
+    return json.dumps(leave.checkUser(content))
 
 @bottle.route('/players')
 def get_players():
