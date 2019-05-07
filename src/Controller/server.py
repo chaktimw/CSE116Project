@@ -42,7 +42,11 @@ def add_player():
     content = bottle.request.body.read().decode()
     content = json.loads(content)
     leave.updatePlayer([content['username'], int(content['size']), int(content['x']), int(content['y'])])
-    return get_players()
+    return get_players2([content['username']])
+
+
+def get_players2(username):
+    return json.dumps(leave.getLeaderboard2(username))
 
 @bottle.post('/checkUser')
 def check_user():
@@ -56,11 +60,11 @@ def get_players():
 
 # /users is for loading all users in real time
 # feature has not yet been implemented in tempGame.js
-@bottle.route('/users')
-def get_users():
-    content = bottle.request.body.read().decode()
-    content = json.loads(content)
-    return json.dumps(leave.getPlayers(content['username']))
+# @bottle.route('/users')
+# def get_users():
+#     content = bottle.request.body.read().decode()
+#     content = json.loads(content)
+#     return json.dumps(leave.getPlayers(content['username']))
 
 
 bottle.run(host='localhost', port=8080)

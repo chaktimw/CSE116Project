@@ -21,8 +21,9 @@ function makeWorld() {
 
     requestAnimationFrame(loop);
 }
+
 // Players
-var enemies = {}
+var enemies = {};
 function enemy(username, size, x, y) {
     this.username = username;
     this.eaten = size;
@@ -34,17 +35,42 @@ function enemy(username, size, x, y) {
 }
 
 function updateEnemies(listOfEnemies){
+    enemies = {};
     for(var playerLine in listOfEnemies){
-        var data = playerLine.split(" ");
-        if(!(data[0] in enemies)){
-            enemies.data[0] = new enemy(data[0], data[1], data[2], data[3])
-        }else{
-            enemies.data[0].eaten = data[1];
-            enemies.data[1].pos_world.x = data[2]
-            enemies.data[1].pos_world.y = data[3]
-        }
+        var data = listOfEnemies[playerLine].split(" ");
+        enemies[data[0]] = new enemy(data[0], data[1], data[2], data[3])
     }
 }
+
+var enemyField = document.createElement("canvas");
+enemyField.style.width = "100%";
+enemyField.style.height= "100%";
+enemyField.height = 3200;
+enemyField.width = 3200;
+var contextEnemies = enemyField.getContext("2d");
+
+function addEnemy(x, y){
+    contextEnemies.beginPath();
+    contextEnemies.arc(x, y, 5, 0, 2 * Math.PI);
+    contextEnemies.fillStyle = "#ffbab3";
+    contextEnemies.fill();
+    contextEnemies.lineWidth = 2;
+    contextEnemies.strokeStyle = "#ff7069";
+    contextEnemies.stroke();
+    contextEnemies.closePath();
+}
+
+function drawEnemies(){
+    contextEnemies.clearRect(0, 0, enemyField.width, enemyField.height);
+
+    for (var unit in enemies){
+        addEnemy(
+            enemies[unit].pos_world.x,
+            enemies[unit].pos_world.y
+        );
+    }
+}
+
 
 // Dots
 var dots = document.createElement("canvas");
@@ -104,9 +130,10 @@ viewport.style.width = "100%";
 viewport.style.height = "100%";
 viewport.width = viewport.offsetWidth;
 viewport.height = viewport.offsetHeight;
+
 //player ID set after game starts
 //this is a huge area for cheating but whaaaatever
-var currentPlayer = ""
+var currentPlayer = "";
 
 
 // Model
@@ -223,7 +250,7 @@ function loop(){
         var d = new Date();
         var n = d.getTime();
         var timePassed = n - players["player"].time;
-        if (timePassed >= 200 && players["player"].alive) {
+        if (timePassed >= 100 && players["player"].alive) {
             //update leaderboard on players.txt
             updateUser(
                 players["player"].user,
@@ -231,7 +258,7 @@ function loop(){
                 players["player"].pos_world.x,
                 players["player"].pos_world.y
             );
-            getEnemies()
+            // getEnemies();
             players["player"].time = n
         }
 
@@ -239,10 +266,15 @@ function loop(){
         getDots();
         drawDots();
 
+        drawEnemies();
+
         contextViewport.drawImage(createWorld, players["player"].pos_world.x - viewport.width / 2,
             players["player"].pos_world.y - viewport.height / 2,
             viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
         contextViewport.drawImage(dots, players["player"].pos_world.x - viewport.width / 2,
+            players["player"].pos_world.y - viewport.height / 2,
+            viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
+        contextViewport.drawImage(enemyField, players["player"].pos_world.x - viewport.width / 2,
             players["player"].pos_world.y - viewport.height / 2,
             viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
 
@@ -269,7 +301,6 @@ startButton.addEventListener("click", function(){
 });
 function start(){
     currentPlayer = players["player"].user = escapeHtml(userName.value);
-    getEnemies()
     updateChara(players["player"].user, players["player"].size, players["player"].pos_player.x, players["player"].pos_player.y);
     userName.value = "";
     startButton.disabled = true;
@@ -349,11 +380,24 @@ function ajaxPostRequest(path, data, callback){
 
 function load(response){
     var players = "";
-    var data = JSON.parse(response)
-    for(var index in data){
-        players += data[index].username + "</br>";
+    var data = JSON.parse(response);
+    var leaderboardData = data["leaderboard"];
+    for(var index in leaderboardData){
+        players += leaderboardData[index] + "</br>";
     }
     document.getElementById("players").innerHTML = players;
+}
+
+function load2(response){
+    var players = "";
+    var data = JSON.parse(response)
+    var leaderboardData = data["leaderboard"];
+    for(var index in leaderboardData){
+        players += leaderboardData[index] + "</br>";
+    }
+    document.getElementById("players").innerHTML = players;
+
+    updateEnemies(data["enemies"])
 }
 
 
@@ -382,8 +426,8 @@ function checkUser() {
 }
 
 function updateUser(user, size, x, y) {
-    var toSend = JSON.stringify({"username": escapeHtml(user), "size": size, "x": x, "y": y});
-    ajaxPostRequest("/update", toSend, load);
+    var toSend = JSON.stringify({"username": user, "size": size, "x": x, "y": y});
+    ajaxPostRequest("/update", toSend, load2);
 }
 
 function removeUser(){
