@@ -27,18 +27,19 @@ def img1():
 def remove_player():
     content = bottle.request.body.read().decode()
     content = json.loads(content)
-    leave.removePlayer(content['username'])
+    leave.removePlayer(content)
     return get_players()
+
 
 @bottle.post('/add')
 def add_player():
     content = bottle.request.body.read().decode()
     content = json.loads(content)
-    leave.addPlayer(content['username'], int(content['x']), int(content['y']))
+    leave.addPlayer(content[0], content[1], content[2])
     return get_players()
 
 @bottle.post('/update')
-def add_player():
+def update_player():
     content = bottle.request.body.read().decode()
     content = json.loads(content)
     leave.updatePlayer(content)
@@ -53,14 +54,6 @@ def check_user():
 @bottle.route('/players')
 def get_players():
     return json.dumps(leave.getLeaderboard())
-
-# /users is for loading all users in real time
-# feature has not yet been implemented in tempGame.js
-# @bottle.route('/users')
-# def get_users():
-#     content = bottle.request.body.read().decode()
-#     content = json.loads(content)
-#     return json.dumps(leave.getPlayers(content['username']))
 
 
 bottle.run(host='localhost', port=8080)

@@ -1,0 +1,9 @@
+{
+  "name": "View",
+  "version": "1.0.0",
+  "main" : "src/View/DesktopApp/main.js",
+  "scripts": {
+    "start": "./node_modules/.bin/electron ."
+  },
+  "dependencies": {}
+}

@@ -52,21 +52,44 @@ def removePlayer(username):
             f.write("")
     f.close()
 
+
+# goes through each line in players.txt and writes it down but
+# if update line has a bigger score than the current lin in player.txt, write update line first
+# check if the line in players.txt matches username of update line
+# also check if update line is already dead
 def updatePlayer(data):
-    removePlayer(data[0])
+    alive = updateHelper(data[0])
     f = open(filename, "r")
     lines = f.readlines()
     f.close()
     f = open(filename, "w")
-    update = True
+    updated = False
     update_line = data[0] + " " + str(data[1]) + " " + str(data[2]) + " " + str(data[3]) + "\n"
+    if not alive:
+        update_line = ""
     for line in lines:
-        # line from players.txt vs line that is to be added
         split_line = line.replace("\n", "").split(" ")
-        if int(split_line[1]) <= data[1] and update:
+        if int(split_line[1]) < data[1] and not updated:
             f.write(update_line)
-            update = False
+            updated = True
         f.write(line)
-    if update:
+    if not updated:
         f.write(update_line)
     f.close()
+
+
+def updateHelper(username):
+    exists = False
+    f = open(filename, "r")
+    lines = f.readlines()
+    f.close()
+    f = open(filename, "w")
+    for line in lines:
+        split_line = line.replace("\n", "").split(" ")
+        if split_line[0] != username:
+            f.write(line)
+        else:
+            f.write("")
+            exists = True
+    f.close()
+    return exists

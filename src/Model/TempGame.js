@@ -23,12 +23,13 @@ function makeWorld() {
 }
 
 var sizeRoot = 7 / 8.0;
+var initialSpeed = 75;
 
 // Players
 var enemies = {};
 function enemy(username, size, x, y) {
     this.username = username;
-    this.eaten = size;
+    this.eaten = parseInt(size);
     this.size = 10 + Math.pow(this.eaten, sizeRoot);
     this.pos_world = {
         "x": x,
@@ -39,11 +40,18 @@ function enemy(username, size, x, y) {
 
 function updateEnemies(listOfEnemies){
     enemies = {};
+    var dead = true;
     for(var playerLine in listOfEnemies){
         var data = listOfEnemies[playerLine].split(" ");
         if(players["player"].user != data[0]) {
             enemies[data[0]] = new enemy(data[0], data[1], data[2], data[3])
+        }else{
+            dead = false
         }
+    }
+    if(dead) {
+        document.getElementById("status").innerHTML = "<----DEAD---->";
+        players["player"] = false
     }
 }
 
@@ -82,16 +90,16 @@ function drawEnemies(){
     }
 }
 
-// enemies eat you
-// not fully done yet
-function eatPlayer(){
+function eatEnemy(){
     for (var i in enemies){
         var dx = players["player"].pos_world.x - enemies[i].pos_world.x;
         var dy = players["player"].pos_world.y - enemies[i].pos_world.y;
         var distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance <= enemies[i].size){
-            kill()
+        if (distance <= players["player"].size && players["player"].eaten >= 1.5 * enemies[i].eaten){
+            players["player"].eaten += 1 + enemies[i].eaten;
+            players["player"].size = 10 + Math.pow(players["player"].eaten, sizeRoot);
+            kill(enemies[i].username)
         }
     }
 }
@@ -169,7 +177,7 @@ var players = {
 };
 
 function Player(){
-    this.alive = true
+    this.alive = true;
 
     this.size = 10;
 
@@ -186,8 +194,8 @@ function Player(){
     };
 
     this.speed = {
-        "x": 5,
-        "y": 5
+        "x": initialSpeed / 10,
+        "y": initialSpeed / 10
     };
 
     //update time - chaktim
@@ -255,8 +263,8 @@ function eatDot(){
                 players["player"].eaten += 1;
                 players["player"].size = 10 + Math.pow(players["player"].eaten, sizeRoot);
 
-                players["player"].speed.x = 50 / players["player"].size;
-                players["player"].speed.y = 50 / players["player"].size;
+                players["player"].speed.x = initialSpeed / players["player"].size;
+                players["player"].speed.y = initialSpeed / players["player"].size;
                 allDots.splice(i, 1);
 
             }
@@ -269,16 +277,19 @@ function loop(){
     //timed updates
     var d = new Date();
     var n = d.getTime();
-    //var timePassed2 = n - players["player"].gametime;
-    //if (timePassed2 >= 10) {
-        if(players["player"].alive) {
+    var timePassed2 = n - players["player"].gametime;
+    if (timePassed2 >= 10) {
+        players["player"].gametime = n;
+        if (players["player"].alive) {
             contextViewport.clearRect(0, 0, viewport.width, viewport.height);
 
             players["player"].update();
 
             //timed updates
             var timePassed = n - players["player"].time;
-            if (timePassed >= 150 && players["player"].alive) {
+            //150ms interval is good
+            if (timePassed >= 175) {
+                players["player"].time = n;
                 //update leaderboard on players.txt
                 updateUser(
                     players["player"].user,
@@ -286,8 +297,7 @@ function loop(){
                     players["player"].pos_world.x,
                     players["player"].pos_world.y
                 );
-                // getEnemies();
-                players["player"].time = n
+                eatEnemy();
             }
 
             eatDot();
@@ -306,16 +316,14 @@ function loop(){
                 players["player"].pos_world.y - viewport.height / 2,
                 viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
 
-
-            updateChara(players["player"].user, players["player"].size, players["player"].pos_player.x, players["player"].pos_player.y);
-
-            requestAnimationFrame(loop);
-        }else{
-            //game over screen
+            updateChara(
+                players["player"].user,
+                players["player"].size,
+                players["player"].pos_player.x,
+                players["player"].pos_player.y);
         }
-
-        //players["player"].gametime = n
-    //}
+    }
+            requestAnimationFrame(loop);
 }
 
 // Start Up of Game / Controls
@@ -330,12 +338,14 @@ function game(){
 startButton.addEventListener("click", function(){
     checkUser()
 });
+
 function start(){
     currentPlayer = players["player"].user = escapeHtml(userName.value);
     updateChara(players["player"].user, players["player"].size, players["player"].pos_player.x, players["player"].pos_player.y);
     userName.value = "";
     startButton.disabled = true;
     game();
+    document.getElementById("status").innerHTML = "ALIVE";
 }
 
 // Movement
@@ -378,9 +388,12 @@ function keyUp(event) {
     }
 }
 
-function kill() {
-    players["player"].alive = false;
-    removeUser()
+function kill(target) {
+    if(target == 0) {
+        removeUser(players["player"].user)
+    }else{
+        removeUser(target)
+    }
 }
 
 //Saving data to filename
@@ -445,10 +458,10 @@ function addUser(response){
     var data = JSON.parse(response)
     if(data == 0) {
         start()
-        var toSend = JSON.stringify({
-            "username": players["player"].user,
-            "x": players["player"].pos_world.x,
-            "y": players["player"].pos_world.y});
+        var toSend = JSON.stringify([
+            players["player"].user,
+            players["player"].pos_world.x,
+            players["player"].pos_world.y]);
         document.getElementById("usernameCheck").innerHTML = "Welcome!";
         ajaxPostRequest("/add", toSend, load);
     }else{
@@ -457,8 +470,13 @@ function addUser(response){
 }
 
 function checkUser() {
-    var toSend = JSON.stringify(escapeHtml(userName.value));
-    ajaxPostRequest("/checkUser", toSend, addUser);
+    var username = escapeHtml(userName.value);
+    if(username.length == 0){
+        document.getElementById("usernameCheck").innerHTML = "Please enter a username before starting.";
+    }else{
+        var toSend = JSON.stringify(username);
+        ajaxPostRequest("/checkUser", toSend, addUser);
+    }
 }
 
 function updateUser(user, size, x, y) {
@@ -466,14 +484,9 @@ function updateUser(user, size, x, y) {
     ajaxPostRequest("/update", toSend, load2);
 }
 
-function removeUser(){
-    var toSend = JSON.stringify({"username": players["player"].user});
+function removeUser(target){
+    var toSend = JSON.stringify(target);
     ajaxPostRequest("/remove", toSend, load);
-}
-
-function getEnemies(){
-    var toSend = JSON.stringify({"username": currentPlayer})
-    ajaxPostRequest("/users", toSend, updateEnemies)
 }
 
 function escapeHtml(unsafe) {
